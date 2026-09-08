@@ -64,7 +64,7 @@ class SourceSlotPanel(
     private val previewHandler: (String) -> Unit,
 ) {
 
-    private val urlField = JTextField(30).apply {
+    private val urlField = JTextField(16).apply {
         minimumSize = Dimension(220, preferredSize.height)
     }
     private val previewButton = JButton(RadioStrings.PREVIEW_BUTTON)

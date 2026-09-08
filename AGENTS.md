@@ -21,7 +21,28 @@
 - 测试依赖：`junit:junit:4.13.2`
 - 配置：`org.gradle.configuration-cache=true`、`org.gradle.caching=true`、
   `kotlin.stdlib.default.dependency=false`
+- Kotlin 编译：`-Xjvm-default=all`（见下方「构建决策」）
 - 版本：`1.0.0-SNAPSHOT`（group=`e.y`）
+
+## 构建决策（2026-09-08，problems-report 清零）
+
+- `-jvm-default=no-compatibility`（build.gradle.kts `kotlin.compilerOptions.freeCompilerArgs`）：
+  Kotlin 实现类若未显式覆写接口默认方法，默认模式会生成「转发桩方法」（字节码
+  override+invokespecial 接口默认方法）。IntelliJ 平台接口多为 Kotlin 接口
+  （`ToolWindowFactory` 等，方法编译成 JVM default），被 pluginVerifier 误报为
+  deprecated/experimental API 使用。加该参数后桩不再生成、告警清零。
+  注：Kotlin 2.3 新选项名无 `-X` 前缀且不再支持 `all`（仅 disable/all-compatibility/all 属于
+  旧 `-X` 名）；`no-compatibility` 与旧 `all` 等价（都是默认方法进接口、不生成转发桩）。
+- 该参数改字节码生成方式（默认方法进接口），**不破坏平台兼容**（目标 IDE 253 起
+  全支持 default 方法）；但若日后手写 `@JvmDefault`/`JvmDefaultWithCompatibility` 需
+  复查（当前项目无此用法）。
+- Settings「高级」折叠区从 `HideableTitledPanel`（@Deprecated）迁移到 UI DSL 2 的
+  `collapsibleGroup`（`panel { collapsibleGroup(title) { row { cell(content) } } }`，
+  返回 `CollapsibleRow`，用 `expanded` 读写展开态、`packWindowHeight = false`）。
+  **不要用 `com.intellij.ui.CollapsiblePanel`**：它的折叠/展开图标必须由调用方传入，
+  传 `null` 时 `setCollapsed` 的 `setIcon` 被判空跳过，切换按钮退化为 7x7 无边框、
+  非 opaque 的空按钮，标题又是重量级 `java.awt.Label`，实际效果是折叠头整体不可见
+  （2026-09-08 曾因此把高级设置折叠菜单改坏）。`HideableDecorator` 同样已 @Deprecated。
 
 ## 常用命令
 

@@ -2,8 +2,11 @@ package e.y.ideradio.settings
 
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
-import com.intellij.ui.HideableTitledPanel
+import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.JBColor
+import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.CollapsibleRow
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.util.ui.JBUI
 import e.y.ideradio.RadioStrings
 import e.y.ideradio.player.PlaybackService
@@ -45,7 +48,7 @@ class RadioSettingsPanel(
 
     // ---- 解析选项（B 站风控/Cookie，v0.10；评审 #16）----
     private val cookieBrowserCombo = JComboBox<CookieBrowserOption>()
-    private val cookieFileField = JTextField(24).apply {
+    private val cookieFileField = JTextField(12).apply {
         minimumSize = Dimension(220, preferredSize.height)
     }
     private val browseCookieButton = JButton(RadioStrings.BROWSE_BUTTON)
@@ -78,6 +81,12 @@ class RadioSettingsPanel(
     )
     private val loopCheckBox = JCheckBox(RadioStrings.LOOP_CHECKBOX)
     private val externalToolsPanel = ExternalToolsPanel(stateRef)
+    /**
+     * 「高级」可折叠容器：UI DSL 2 的 collapsibleGroup（官方对已废弃 HideableTitledPanel 的替代）。
+     * 注意不要用 com.intellij.ui.CollapsiblePanel：其切换按钮的图标必须由调用方传入，
+     * 传 null 时按钮为 7x7 无边框空按钮（setIcon 被 null 判空跳过），标题还是重量级
+     * java.awt.Label，结果是整个折叠头在设置页里根本看不见。
+     */
     private val advancedContent = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
         alignmentX = Component.LEFT_ALIGNMENT
@@ -85,14 +94,26 @@ class RadioSettingsPanel(
         add(Box.createVerticalStrut(8))
         add(externalToolsPanel)
     }
-    private val advancedPanel = HideableTitledPanel(
-        RadioStrings.ADVANCED_SETTINGS_TITLE,
-        false,
-        advancedContent,
-        stateRef().advancedExpanded,
-    ).apply {
+    private var advancedRow: CollapsibleRow? = null
+    private val advancedPanel: DialogPanel = panel {
+        advancedRow = collapsibleGroup(RadioStrings.ADVANCED_SETTINGS_TITLE) {
+            row {
+                cell(advancedContent).align(AlignX.FILL)
+            }
+        }.apply {
+            expanded = stateRef().advancedExpanded
+            // 设置页不允许折叠区反过来改对话框高度
+            packWindowHeight = false
+        }
+    }.apply {
         alignmentX = Component.LEFT_ALIGNMENT
     }
+    /** 当前高级区是否展开（默认展开）。 */
+    private var advancedExpanded: Boolean
+        get() = advancedRow?.expanded ?: true
+        set(value) {
+            advancedRow?.expanded = value
+        }
     private val root = object : JPanel(), javax.swing.Scrollable {
         init {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -213,7 +234,7 @@ class RadioSettingsPanel(
     fun detectExternalTools() {
         externalToolsPanel.detect { failing ->
             if (failing) {
-                advancedPanel.setOn(true)
+                advancedExpanded = true
             }
         }
     }
@@ -229,7 +250,7 @@ class RadioSettingsPanel(
         cookieFileField.text = state.cookiesFilePath
         cookieFileField.caretPosition = 0
         cookieFileField.toolTipText = state.cookiesFilePath.ifBlank { null }
-        advancedPanel.setOn(state.advancedExpanded)
+        advancedExpanded = state.advancedExpanded
     }
 
     /** isModified：比较 UI 与持久化状态（两栏 URL、循环、外部工具、Cookie）。 */
@@ -256,7 +277,7 @@ class RadioSettingsPanel(
         externalToolsPanel.apply()
         state.cookiesFromBrowser = (cookieBrowserCombo.selectedItem as CookieBrowserOption).key
         state.cookiesFilePath = cookieFileField.text.trim()
-        state.advancedExpanded = advancedPanel.isExpanded()
+        state.advancedExpanded = advancedExpanded
         if (changed) commitHandler()
     }
 

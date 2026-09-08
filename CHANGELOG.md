@@ -19,6 +19,8 @@
 
 ### Changed
 
+- Settings「高级」折叠区改用 UI DSL 2 的 `collapsibleGroup` 替代已废弃的 `HideableTitledPanel`（此前一版误用 `com.intellij.ui.CollapsiblePanel` 且未传图标，导致折叠头完全不可见）。
+- 调整 Settings 页输入框的初始长度：将 YouTube / Bilibili 平台链接输入框从 30 列缩短至 16 列，`cookies.txt` 路径输入框从 24 列缩短至 12 列（在窄窗口或默认宽度下更紧凑，且保持水平自适应）。
 - 集中管理所有字符串与汉字：将 Kotlin 代码中的 UI 文本、按钮文案、提示信息、错误/状态消息及工具名称全部重构并集中到 `RadioStrings` 常量定义文件中管理。
 - 外部工具管理改为仅检测：插件不再安装或升级 yt-dlp/ffmpeg；检测到后自动填写路径，
   未检测到则提示参考 README 自行安装和升级，并保留文件选择器兜底。
