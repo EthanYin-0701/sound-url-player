@@ -1,0 +1,75 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>e.y.sound-url-player</id>
+
+    <!-- Public plugin name should be written in Title Case.
+     Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
+    <name>IDE-Radio</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor url="https://github.com/EthanYin-0701">Ethan</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
+    <description><![CDATA[
+        <p><b>IDE Radio</b> plays YouTube and Bilibili audio directly inside your IDE, featuring a live waveform and spectrum visualizer in a dedicated Tool Window.</p>
+
+        <h3>Features</h3>
+        <ul>
+            <li><b>Audio Playback:</b> Stream audio directly from YouTube and Bilibili URLs without video rendering overhead.</li>
+            <li><b>Dedicated Settings:</b> Configure independent source slots for YouTube and Bilibili under <i>Settings &rarr; Tools &rarr; IDE Radio</i>. Preview track titles and duration before saving.</li>
+            <li><b>Mutually Exclusive Sources:</b> Easily switch between active platforms with atomic source switching and unified session controls.</li>
+            <li><b>Transport Controls:</b> Play, pause, stop, and loop playback (single-track loop enabled by default) from both the Settings page and the Tool Window.</li>
+            <li><b>Live Visualizer Tool Window:</b> Real-time audio visualizer tool window at the bottom. Click the canvas to toggle between waveform and spectrum bar displays.</li>
+            <li><b>Cookie Support & Advanced Settings:</b> Configure browser cookies or <i>cookies.txt</i> under Advanced Settings to mitigate Bilibili 412 rate-limiting.</li>
+            <li><b>Automatic Retries & Error Handling:</b> Automatic retries (up to 3 times) with exponential backoff on network/412/429/5xx errors, featuring a manual <i>[Retry]</i> button.</li>
+            <li><b>Privacy Conscious:</b> Stream URLs and authentication tokens are kept strictly in memory and sanitized in UI and logs.</li>
+        </ul>
+
+        <h3>Requirements</h3>
+        <p>IDE Radio relies on local CLI tools to resolve and stream audio:</p>
+        <ul>
+            <li><b><a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a></b>: Extracts audio stream info and metadata.</li>
+            <li><b><a href="https://ffmpeg.org">ffmpeg</a></b>: Decodes remote audio streams to PCM for playback.</li>
+        </ul>
+        <p><i>Note: yt-dlp and ffmpeg are not bundled with the plugin and must be installed on your system PATH or configured in Settings.</i></p>
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+
+
+    <!-- Extensions defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- 设置页：挂到内置 Tools 组（parentId="tools"，T1 待 runIde 实测，设计 §5.1） -->
+        <applicationConfigurable
+                parentId="tools"
+                groupWeight="10"
+                id="e.y.ideradio.settings"
+                displayName="IDE Radio"
+                instance="e.y.ideradio.settings.RadioSettingsConfigurable"/>
+
+        <!-- 播放会话服务（application 级单例，设计 §7） -->
+        <applicationService
+                serviceImplementation="e.y.ideradio.player.PlaybackService"/>
+
+        <!-- 全局解析结果缓存（提交解析/播放取流，设计 §4.2/§6.4） -->
+        <applicationService
+                serviceImplementation="e.y.ideradio.resolve.ResolveManager"/>
+
+        <!-- 设置状态持久化（bean，设计 §4.1） -->
+        <applicationService
+                serviceImplementation="e.y.ideradio.settings.RadioSettingsState"/>
+
+        <!-- 可视化 Tool Window（按 project 实例化；多窗口共享同一播放会话，设计 §8.1） -->
+        <toolWindow
+                id="IDE Radio"
+                anchor="bottom"
+                icon="/icons/radio.svg"
+                factoryClass="e.y.ideradio.toolwindow.IdeRadioToolWindowFactory"/>
+    </extensions>
+
+</idea-plugin>

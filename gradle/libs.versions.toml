@@ -1,0 +1,7 @@
+[versions]
+junit = "4.13.2"
+kotlinxSerializationJson = "1.8.1"
+
+[libraries]
+junit = { module = "junit:junit", version.ref = "junit" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

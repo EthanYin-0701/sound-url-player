@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 13 13">
+  <!-- 简化：无线广播/声波图标（波形 + 圆点天线） -->
+  <g fill="none" stroke="#6E6E6E" stroke-width="1.4" stroke-linecap="round">
+    <!-- 声波弧线（波形可视化意象） -->
+    <path d="M1.5 6.5 a2 2.6 0 0 1 4 0 a1.4 1.8 0 0 1 -2.8 0 a0.9 1.1 0 0 1 1.8 0"/>
+    <path d="M8 4.5 a3.6 4.4 0 0 1 0 4"/>
+    <path d="M10.2 2.8 a6 6.8 0 0 1 0 7.4"/>
+    <!-- 底边基线 -->
+    <path d="M1 11.5 h11"/>
+  </g>
+</svg>
