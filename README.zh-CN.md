@@ -244,5 +244,4 @@ yt-dlp 与 ffmpeg 是**子进程**，只继承 IDE 进程的环境变量——ID
 
 ## 许可证
 
-待定（尚未发布）。插件 ID `e.y.sound-url-player` 已定稿、首次发布后不可变更；
-`plugin.xml` 中的 `vendor` / `description` 目前仍是占位符。
+MIT —— 详见 [LICENSE](LICENSE)。

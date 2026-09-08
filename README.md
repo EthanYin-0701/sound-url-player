@@ -262,6 +262,4 @@ At the bottom of **Settings → Tools → IDE Radio**, there is an **Advanced Se
 
 ## License
 
-TBD — not yet published. The plugin ID `e.y.sound-url-player` is final and cannot be
-changed after the first release; `vendor` / `description` in `plugin.xml` are still
-placeholders.
+MIT — see [LICENSE](LICENSE).
