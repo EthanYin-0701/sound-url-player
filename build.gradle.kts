@@ -1,3 +1,4 @@
+import com.github.javaparser.printer.concretesyntaxmodel.CsmElement.token
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -27,8 +28,13 @@ dependencies {
     intellijPlatform {
         intellijIdea("2025.3.5")
         testFramework(TestFrameworkType.Platform)
-
         // Add plugin dependencies for compilation here, for example:
         // bundledPlugin("com.intellij.java")
+    }
+}
+
+tasks {
+    publishPlugin {
+        token = providers.gradleProperty("intellijPlatformPublishingToken")
     }
 }

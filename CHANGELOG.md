@@ -2,7 +2,9 @@
 
 # IDE Radio Changelog
 
-## [Unreleased]
+## Unreleased
+
+## 1.0.1 - 2026-09-09
 
 ### Added
 
